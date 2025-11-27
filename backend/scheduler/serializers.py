@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 class SubstituteSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     full_name = serializers.CharField(
-        source='user.get_full_name', readonly=True)
+        source='user.get_full_name', read_only=True)
 
     class Meta:
         model = Substitute

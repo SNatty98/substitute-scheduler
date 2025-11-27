@@ -1,4 +1,5 @@
 from ..models import User, Substitute
+from .postcode_service import PostcodeService
 
 
 class UserService:
@@ -9,6 +10,11 @@ class UserService:
 
         if User.objects.filter(username=username).exists():
             raise ValueError("Username already exists")
+
+        try:
+            postcode_data = PostcodeService.lookup(postcode)
+        except ValueError as e:
+            raise ValueError(f"Invalid postcode: {str(e)}")
 
         user = User.objects.create(
             username=username,
@@ -22,7 +28,9 @@ class UserService:
 
         substitute = Substitute.objects.create(
             user=user,
-            postcode=postcode,
+            postcode=postcode_data['postcode'],
+            latitude=postcode_data['latitude'],
+            longitude=postcode_data['longitude'],
             phone=phone,
             subjects=subjects,
             qualifications=qualifications

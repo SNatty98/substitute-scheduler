@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 
 from ..models import Assignment, Application
@@ -40,7 +41,22 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+        try:
+            assignment = AssignmentService.create_with_postcode_lookup(
+                school_name=serializer.validated_data['school_name'],
+                school_postcode=serializer.validated_data['school_postcode'],
+                date=serializer.validated_data['date'],
+                start_time=serializer.validated_data['start_time'],
+                end_time=serializer.validated_data['end_time'],
+                subject=serializer.validated_data['subject'],
+                year_group=serializer.validated_data.get('year_group', ''),
+                notes=serializer.validated_data.get('notes', ''),
+                created_by=self.request.user
+            )
+        # Update the serializer instance with the created assignment
+            serializer.instance = assignment
+        except ValueError as e:
+            raise ValidationError({'school_postcode': str(e)})
 
     @action(detail=True, methods=['post'])
     def select_substitute(self, request, pk=None):
@@ -56,5 +72,9 @@ class AssignmentViewSet(viewsets.ModelViewSet):
         try:
             assignment = AssignmentService.select_substitute(
                 assignment, application)
+            return Response(
+                AssignmentDetailSerializer(assignment).data,
+                status=status.HTTP_200_OK
+            )
         except ValueError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from ..models import Application
 from ..serializers import ApplicationSerializer
+from ..services import PostcodeService
 
 
 class ApplicationViewSet(viewsets.ModelViewSet):
@@ -29,4 +30,13 @@ class ApplicationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         """Auto-set substitute when creating application"""
         substitute = self.request.user.substitute_profile
-        serializer.save(substitute=substitute)
+        assignment = serializer.validated_data['assignment']
+
+        distance = PostcodeService.calculate_distance(
+            substitute.latitude,
+            substitute.longitude,
+            assignment.school_latitude,
+            assignment.school_longitude
+        )
+
+        serializer.save(substitute=substitute, distance_miles=distance)

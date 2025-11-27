@@ -31,6 +31,7 @@ class AssignmentListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignment
         fields = '__all__'
+        read_only_fields = ['created_by', 'created_at', 'updated_at']
 
 
 class AssignmentDetailSerializer(serializers.ModelSerializer):

@@ -53,8 +53,6 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             assignment=assignment
         )
 
-        from .services.assignment_service import AssignmentService
-
         try:
             assignment = AssignmentService.select_substitute(
                 assignment, application)

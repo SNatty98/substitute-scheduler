@@ -1,0 +1,60 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Admin Dashboard">
+    <main>
+        <div id="loading">Loading...</div>
+        <div id="content">
+            <h1>Admin Dashboard</h1>
+            <p>Welcome, <span id="userName"></span>!</p>
+            <p>You are logged in as an admin.</p>
+            <button id="logoutBtn"> Logout </button>
+        </div>
+    </main>
+</BaseLayout>
+
+<script>
+    import { authService } from "../../services/authService";
+
+    async function checkAuth() {
+        const loading = document.getElementById("loading");
+        const content = document.getElementById("content");
+
+        if (!authService.isAuthenticated()) {
+            console.log("No token found");
+            window.location.href = "/login";
+            return;
+        }
+
+        try {
+            const user = await authService.getCurrentUser();
+            console.log("User:", user); // Debug log
+
+            // Check if user is actually an admin
+            if (user.role !== "admin") {
+                console.log(
+                    "User is not admin, redirecting to substitute dashboard",
+                );
+                window.location.href = "/substitute/dashboard";
+                return;
+            }
+
+            // Show content
+            document.getElementById("userName")!.textContent =
+                user.first_name || user.username;
+            loading!.style.display = "none";
+            content!.style.display = "block";
+        } catch (error) {
+            console.error("Auth check failed:", error); // Debug log
+            localStorage.removeItem("token"); // Clear invalid token
+            window.location.href = "/login";
+        }
+    }
+
+    checkAuth();
+
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+        authService.logout();
+    });
+</script>

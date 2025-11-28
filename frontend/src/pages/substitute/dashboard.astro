@@ -1,0 +1,53 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Substitute Dashboard">
+    <main>
+        <div id="loading">Loading...</div>
+        <div id="content">
+            <h1>Substitute Dashboard</h1>
+            <p>Welcome, <span id="userName"></span>!</p>
+            <p>You are logged in as a substitute teacher.</p>
+            <button id="logoutBtn"> Logout </button>
+        </div>
+    </main>
+</BaseLayout>
+
+<script>
+    import { authService } from "../../services/authService";
+
+    async function checkAuth() {
+        const loading = document.getElementById("loading");
+        const content = document.getElementById("content");
+
+        if (!authService.isAuthenticated()) {
+            window.location.href = "/login";
+            return;
+        }
+
+        try {
+            const user = await authService.getCurrentUser();
+
+            // Check if user is actually a substitute
+            if (user.role !== "substitute") {
+                window.location.href = "/admin/dashboard";
+                return;
+            }
+
+            // Show content
+            document.getElementById("userName")!.textContent =
+                user.first_name || user.username;
+            loading!.style.display = "none";
+            content!.style.display = "block";
+        } catch (error) {
+            window.location.href = "/login";
+        }
+    }
+
+    checkAuth();
+
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+        authService.logout();
+    });
+</script>

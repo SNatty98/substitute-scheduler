@@ -3,16 +3,75 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 ---
 
 <BaseLayout title="Admin Dashboard">
-    <main>
+    <main class="dashboard">
         <div id="loading">Loading...</div>
-        <div id="content">
-            <h1>Admin Dashboard</h1>
-            <p>Welcome, <span id="userName"></span>!</p>
-            <p>You are logged in as an admin.</p>
-            <button id="logoutBtn"> Logout </button>
+        <div id="content" style="display: none;">
+            <header class="dashboard-header">
+                <div class="container">
+                    <h1>Admin Dashboard</h1>
+                    <p class="welcome">Welcome, <span id="userName"></span>!</p>
+                    <button id="logoutBtn" class="btn-logout">Logout</button>
+                </div>
+            </header>
         </div>
     </main>
 </BaseLayout>
+
+<style>
+    .dashboard {
+        min-height: 100vh;
+    }
+
+    #loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        font-size: var(--font-lg);
+        color: var(--color-text-light);
+    }
+
+    .dashboard-header {
+        background: var(--color-bg-white);
+        border-bottom: 1px solid var(--color-border);
+        padding: var(--spacing-md) 0;
+        margin-bottom: var(--spacing-xl);
+    }
+
+    .dashboard-header .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .dashboard-header h1 {
+        margin: 0;
+        font-size: var(--font-2xl);
+        color: var(--color-text);
+    }
+
+    .welcome {
+        margin: var(--spacing-xs) 0 0 0;
+        color: var(--color-text-light);
+        font-size: var(--font-sm);
+    }
+
+    .btn-logout {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        background: var(--color-danger);
+        color: var(--color-bg-white);
+        border: none;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-base);
+        font-weight: var(--font-medium);
+        cursor: pointer;
+        transition: background var(--transition-base);
+    }
+
+    .btn-logout:hover {
+        background: var(--color-danger-hover);
+    }
+</style>
 
 <script>
     import { authService } from "../../services/authService";
@@ -22,20 +81,14 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         const content = document.getElementById("content");
 
         if (!authService.isAuthenticated()) {
-            console.log("No token found");
             window.location.href = "/login";
             return;
         }
 
         try {
             const user = await authService.getCurrentUser();
-            console.log("User:", user); // Debug log
 
-            // Check if user is actually an admin
             if (user.role !== "admin") {
-                console.log(
-                    "User is not admin, redirecting to substitute dashboard",
-                );
                 window.location.href = "/substitute/dashboard";
                 return;
             }
@@ -46,8 +99,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
             loading!.style.display = "none";
             content!.style.display = "block";
         } catch (error) {
-            console.error("Auth check failed:", error); // Debug log
-            localStorage.removeItem("token"); // Clear invalid token
+            localStorage.removeItem("token");
             window.location.href = "/login";
         }
     }

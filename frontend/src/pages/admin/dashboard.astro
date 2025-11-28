@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import AssignmentCard from "../../components/AssignmentCard.vue";
 ---
 
 <BaseLayout title="Admin Dashboard">
@@ -28,169 +29,177 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                             </button>
                         </div>
 
-                        <div class="placeholder">
-                            <p>Assignment list will appear here...</p>
-                            <p class="hint">
-                                Click "Create Assignment" to add your first
-                                assignment
-                            </p>
-                        </div>
+                        <div id="assignments-app"></div>
                     </section>
                 </div>
             </div>
+            <div id="modal-app"></div>
         </div>
-
-        <!-- Modal Container (rendered by Vue) -->
-        <div id="modal-app"></div>
     </main>
-</BaseLayout>
 
-<style>
-    .dashboard {
-        min-height: 100vh;
-    }
-
-    #loading {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        font-size: var(--font-lg);
-        color: var(--color-text-light);
-    }
-
-    .dashboard-header {
-        background: var(--color-bg-white);
-        border-bottom: 1px solid var(--color-border);
-        padding: var(--spacing-md) 0;
-        margin-bottom: var(--spacing-xl);
-    }
-
-    .dashboard-header .container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .dashboard-header h1 {
-        margin: 0;
-        font-size: var(--font-2xl);
-        color: var(--color-text);
-    }
-
-    .welcome {
-        margin: var(--spacing-xs) 0 0 0;
-        color: var(--color-text-light);
-        font-size: var(--font-sm);
-    }
-
-    .btn-logout {
-        padding: var(--spacing-sm) var(--spacing-lg);
-        background: var(--color-danger);
-        color: var(--color-bg-white);
-        border: none;
-        border-radius: var(--radius-sm);
-        font-size: var(--font-base);
-        font-weight: var(--font-medium);
-        cursor: pointer;
-        transition: background var(--transition-base);
-    }
-
-    .btn-logout:hover {
-        background: var(--color-danger-hover);
-    }
-
-    .dashboard-main {
-        padding: 0 0 var(--spacing-xl) 0;
-    }
-
-    .assignments-section {
-        margin-bottom: var(--spacing-2xl);
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: var(--spacing-lg);
-    }
-
-    .section-header h2 {
-        margin: 0;
-        font-size: var(--font-xl);
-        color: var(--color-text);
-    }
-
-    .btn-create {
-        padding: var(--spacing-sm) var(--spacing-lg);
-        background: var(--color-primary);
-        color: var(--color-bg-white);
-        border: none;
-        border-radius: var(--radius-sm);
-        font-size: var(--font-base);
-        font-weight: var(--font-medium);
-        cursor: pointer;
-        transition: background var(--transition-base);
-    }
-
-    .btn-create:hover {
-        background: var(--color-primary-hover);
-    }
-
-    .placeholder {
-        padding: var(--spacing-2xl);
-        text-align: center;
-        background: var(--color-bg-white);
-        border: 2px dashed var(--color-border);
-        border-radius: var(--radius-md);
-        color: var(--color-text-light);
-    }
-
-    .placeholder p {
-        margin: 0;
-    }
-
-    .hint {
-        margin-top: var(--spacing-sm);
-        font-size: var(--font-sm);
-        color: var(--color-text-muted);
-    }
-</style>
-
-<script>
-    import { createApp } from "vue";
-    import { authService } from "../../services/authService";
-    import ModalContainer from "../../components/ModalContainer.vue";
-
-    let modalApp: any;
-
-    async function checkAuth() {
-        const loading = document.getElementById("loading");
-        const content = document.getElementById("content");
-
-        if (!authService.isAuthenticated()) {
-            window.location.href = "/login";
-            return;
+    <style>
+        .dashboard {
+            min-height: 100vh;
         }
 
-        try {
-            const user = await authService.getCurrentUser();
+        #loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: var(--font-lg);
+            color: var(--color-text-light);
+        }
 
-            if (user.role !== "admin") {
-                window.location.href = "/substitute/dashboard";
+        .dashboard-header {
+            background: var(--color-bg-white);
+            border-bottom: 1px solid var(--color-border);
+            padding: var(--spacing-md) 0;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .dashboard-header .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: var(--font-2xl);
+            color: var(--color-text);
+        }
+
+        .welcome {
+            margin: var(--spacing-xs) 0 0 0;
+            color: var(--color-text-light);
+            font-size: var(--font-sm);
+        }
+
+        .btn-logout {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--color-danger);
+            color: var(--color-bg-white);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-base);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: background var(--transition-base);
+        }
+
+        .btn-logout:hover {
+            background: var(--color-danger-hover);
+        }
+
+        .dashboard-main {
+            padding: 0 0 var(--spacing-xl) 0;
+        }
+
+        .assignments-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .section-header h2 {
+            margin: 0;
+            font-size: var(--font-xl);
+            color: var(--color-text);
+        }
+
+        .btn-create {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--color-primary);
+            color: var(--color-bg-white);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-base);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: background var(--transition-base);
+        }
+
+        .btn-create:hover {
+            background: var(--color-primary-hover);
+        }
+
+        .placeholder {
+            padding: var(--spacing-2xl);
+            text-align: center;
+            background: var(--color-bg-white);
+            border: 2px dashed var(--color-border);
+            border-radius: var(--radius-md);
+            color: var(--color-text-light);
+        }
+
+        .placeholder p {
+            margin: 0;
+        }
+
+        .hint {
+            margin-top: var(--spacing-sm);
+            font-size: var(--font-sm);
+            color: var(--color-text-muted);
+        }
+    </style>
+
+    <script>
+        import { createApp } from "vue";
+        import { authService } from "../../services/authService";
+        import DashboardContent from "../../components/DashboardContent.vue";
+        import ModalContainer from "../../components/ModalContainer.vue";
+
+        let modalApp: any;
+
+        async function checkAuth() {
+            const loading = document.getElementById("loading");
+            const content = document.getElementById("content");
+
+            if (!authService.isAuthenticated()) {
+                window.location.href = "/login";
                 return;
             }
 
-            // Show content
-            document.getElementById("userName")!.textContent =
-                user.first_name || user.username;
-            loading!.style.display = "none";
-            content!.style.display = "block";
+            try {
+                const user = await authService.getCurrentUser();
 
-            // Setup modal
-            setupModal();
+                if (user.role !== "admin") {
+                    window.location.href = "/substitute/dashboard";
+                    return;
+                }
 
-            // Setup button listeners
+                // Show content
+                document.getElementById("userName")!.textContent =
+                    user.first_name || user.username;
+                loading!.style.display = "none";
+                content!.style.display = "block";
+
+                setupModal();
+                setupAssignments();
+                setupButtons();
+            } catch (error) {
+                localStorage.removeItem("token");
+                window.location.href = "/login";
+            }
+        }
+
+        function setupAssignments() {
+            const assignmentsApp = createApp(DashboardContent);
+            assignmentsApp.mount("#assignments-app");
+        }
+
+        function setupModal() {
+            const app = createApp(ModalContainer);
+            modalApp = app.mount("#modal-app");
+        }
+
+        function setupButtons() {
             document
                 .getElementById("logoutBtn")
                 ?.addEventListener("click", () => {
@@ -202,16 +211,8 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 ?.addEventListener("click", () => {
                     modalApp.openModal();
                 });
-        } catch (error) {
-            localStorage.removeItem("token");
-            window.location.href = "/login";
         }
-    }
 
-    function setupModal() {
-        const app = createApp(ModalContainer);
-        modalApp = app.mount("#modal-app");
-    }
-
-    checkAuth();
-</script>
+        checkAuth();
+    </script>
+</BaseLayout>

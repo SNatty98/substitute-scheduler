@@ -8,12 +8,40 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         <div id="content" style="display: none;">
             <header class="dashboard-header">
                 <div class="container">
-                    <h1>Admin Dashboard</h1>
-                    <p class="welcome">Welcome, <span id="userName"></span>!</p>
+                    <div>
+                        <h1>Admin Dashboard</h1>
+                        <p class="welcome">
+                            Welcome, <span id="userName"></span>!
+                        </p>
+                    </div>
                     <button id="logoutBtn" class="btn-logout">Logout</button>
                 </div>
             </header>
+
+            <div class="dashboard-main">
+                <div class="container">
+                    <section class="assignments-section">
+                        <div class="section-header">
+                            <h2>Assignments</h2>
+                            <button id="createBtn" class="btn-create"
+                                >Create Assignment
+                            </button>
+                        </div>
+
+                        <div class="placeholder">
+                            <p>Assignment list will appear here...</p>
+                            <p class="hint">
+                                Click "Create Assignment" to add your first
+                                assignment
+                            </p>
+                        </div>
+                    </section>
+                </div>
+            </div>
         </div>
+
+        <!-- Modal Container (rendered by Vue) -->
+        <div id="modal-app"></div>
     </main>
 </BaseLayout>
 
@@ -71,10 +99,70 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     .btn-logout:hover {
         background: var(--color-danger-hover);
     }
+
+    .dashboard-main {
+        padding: 0 0 var(--spacing-xl) 0;
+    }
+
+    .assignments-section {
+        margin-bottom: var(--spacing-2xl);
+    }
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: var(--spacing-lg);
+    }
+
+    .section-header h2 {
+        margin: 0;
+        font-size: var(--font-xl);
+        color: var(--color-text);
+    }
+
+    .btn-create {
+        padding: var(--spacing-sm) var(--spacing-lg);
+        background: var(--color-primary);
+        color: var(--color-bg-white);
+        border: none;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-base);
+        font-weight: var(--font-medium);
+        cursor: pointer;
+        transition: background var(--transition-base);
+    }
+
+    .btn-create:hover {
+        background: var(--color-primary-hover);
+    }
+
+    .placeholder {
+        padding: var(--spacing-2xl);
+        text-align: center;
+        background: var(--color-bg-white);
+        border: 2px dashed var(--color-border);
+        border-radius: var(--radius-md);
+        color: var(--color-text-light);
+    }
+
+    .placeholder p {
+        margin: 0;
+    }
+
+    .hint {
+        margin-top: var(--spacing-sm);
+        font-size: var(--font-sm);
+        color: var(--color-text-muted);
+    }
 </style>
 
 <script>
+    import { createApp } from "vue";
     import { authService } from "../../services/authService";
+    import ModalContainer from "../../components/ModalContainer.vue";
+
+    let modalApp: any;
 
     async function checkAuth() {
         const loading = document.getElementById("loading");
@@ -98,15 +186,32 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
                 user.first_name || user.username;
             loading!.style.display = "none";
             content!.style.display = "block";
+
+            // Setup modal
+            setupModal();
+
+            // Setup button listeners
+            document
+                .getElementById("logoutBtn")
+                ?.addEventListener("click", () => {
+                    authService.logout();
+                });
+
+            document
+                .getElementById("createBtn")
+                ?.addEventListener("click", () => {
+                    modalApp.openModal();
+                });
         } catch (error) {
             localStorage.removeItem("token");
             window.location.href = "/login";
         }
     }
 
-    checkAuth();
+    function setupModal() {
+        const app = createApp(ModalContainer);
+        modalApp = app.mount("#modal-app");
+    }
 
-    document.getElementById("logoutBtn")?.addEventListener("click", () => {
-        authService.logout();
-    });
+    checkAuth();
 </script>

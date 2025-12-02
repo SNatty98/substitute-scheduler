@@ -16,6 +16,7 @@ function closeModal() {
 function handleSuccess() {
   showModal.value = false;
   alert('Assignment created successfully!');
+  window.dispatchEvent(new Event('refresh-assignments'));
 }
 
 defineExpose({ openModal });

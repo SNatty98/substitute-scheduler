@@ -156,6 +156,7 @@ import AssignmentCard from "../../components/AssignmentCard.vue";
         import ModalContainer from "../../components/ModalContainer.vue";
 
         let modalApp: any;
+        let assignmentsApp: any;
 
         async function checkAuth() {
             const loading = document.getElementById("loading");
@@ -190,8 +191,8 @@ import AssignmentCard from "../../components/AssignmentCard.vue";
         }
 
         function setupAssignments() {
-            const assignmentsApp = createApp(DashboardContent);
-            assignmentsApp.mount("#assignments-app");
+            const app = createApp(DashboardContent);
+            assignmentsApp = app.mount("#assignments-app");
         }
 
         function setupModal() {

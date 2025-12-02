@@ -1,0 +1,23 @@
+---
+export const prerender = false;
+
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+const { id } = Astro.params;
+---
+
+<BaseLayout title="Assignment Details">
+    <div id="app" data-assignment-id={id}></div>
+</BaseLayout>
+
+<script>
+    import { createApp } from "vue";
+    import AssignmentDetails from "../../../components/AssignmentDetails.vue";
+
+    const appElement = document.getElementById("app")!;
+    const id = appElement.dataset.assignmentId!;
+
+    const app = createApp(AssignmentDetails, {
+        assignmentId: parseInt(id),
+    });
+    app.mount("#app");
+</script>

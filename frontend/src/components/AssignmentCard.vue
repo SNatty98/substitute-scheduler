@@ -1,5 +1,7 @@
 <script setup>
+import { computed } from 'vue';
 const props = defineProps({
+    id:Number,
     school_name:String,
     date:String,
     subject:String,
@@ -8,48 +10,58 @@ const props = defineProps({
     status:String,
     application_count:Number
 });
+const detailsUrl = computed(() => `/admin/assignments/${props.id}`);
 </script>
 
 <template>
-  <div class="assignment-card">
-    <div class="card-header">
-      <h3 class="school-name">{{school_name}}</h3>
-      <span class="badge badge-open">open</span>
+  <a :href="detailsUrl" class="card-link">
+    <div class="assignment-card">
+      <div class="card-header">
+        <h3 class="school-name">{{school_name}}</h3>
+        <span class="badge badge-open">open</span>
+      </div>
+      
+      <div class="card-body">
+        <div class="info-row">
+          <span class="label">Subject:</span>
+          <span class="value">{{subject}}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Date:</span>
+          <span class="value">{{date}}</span>
+        </div>
+        
+        <div class="info-row">
+          <span class="label">Time:</span>
+          <span class="value">{{start_time}} - {{end_time}}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Status:</span>
+          <span class="value">{{status}}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Application Count:</span>
+          <span class="value">{{application_count}}</span>
+        </div>
+      </div>
+      
+      <div class="card-footer">
+        <!-- Buttons or actions go here -->
+      </div>
     </div>
-
-    <div class="card-body">
-      <div class="info-row">
-        <span class="label">Subject:</span>
-        <span class="value">{{subject}}</span>
-      </div>
-
-      <div class="info-row">
-        <span class="label">Date:</span>
-        <span class="value">{{date}}</span>
-      </div>
-
-      <div class="info-row">
-        <span class="label">Time:</span>
-        <span class="value">{{start_time}} - {{end_time}}</span>
-      </div>
-          <div class="info-row">
-        <span class="label">Status:</span>
-        <span class="value">{{status}}</span>
-      </div>
-          <div class="info-row">
-        <span class="label">Application Count:</span>
-        <span class="value">{{application_count}}</span>
-      </div>
-    </div>
-
-    <div class="card-footer">
-      <!-- Buttons or actions go here -->
-    </div>
-  </div>
+  </a>
 </template>
 
 
 <style scoped>
+.card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: transform var(--transition-base);
+}
+
 .assignment-card {
   background: var(--color-bg-white);
   border: 1px solid var(--color-border);

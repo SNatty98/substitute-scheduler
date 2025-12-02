@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { assignmentService } from '../services/assignmentService';
 import AssignmentCard from './AssignmentCard.vue';
 
@@ -7,7 +7,7 @@ const assignments = ref([]);
 const loading = ref(true);
 const error = ref('');
 
-onMounted(async () => {
+async function loadAssignments() {
   try {
     assignments.value = await assignmentService.getAll();
     console.log('Assignments loaded:', assignments.value);
@@ -17,7 +17,17 @@ onMounted(async () => {
   } finally {
     loading.value = false;
   }
+};
+
+onMounted(() => {
+  loadAssignments();
+  window.addEventListener('refresh-assignments', loadAssignments);
 });
+
+onUnmounted(() => {
+  window.removeEventListener('refresh-assignments', loadAssignments);
+});
+
 </script>
 
 <template>
@@ -38,7 +48,7 @@ onMounted(async () => {
     <div v-else class="assignments-grid">
       <AssignmentCard 
         v-for="assignment in assignments" 
-        :key="assignment.id"
+        :id="assignment.id"
         :school_name="assignment.school_name"
         :subject="assignment.subject"
         :date="assignment.date"

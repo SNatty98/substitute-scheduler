@@ -8,7 +8,8 @@ const props = defineProps({
     start_time:String,
     end_time:String,
     status:String,
-    application_count:Number
+    application_count:Number,
+    postcode:String
 });
 const detailsUrl = computed(() => `/admin/assignments/${props.id}`);
 </script>
@@ -18,7 +19,7 @@ const detailsUrl = computed(() => `/admin/assignments/${props.id}`);
     <div class="assignment-card">
       <div class="card-header">
         <h3 class="school-name">{{school_name}}</h3>
-        <span class="badge badge-open">open</span>
+        <span class="badge badge-open">{{status}}</span>
       </div>
       
       <div class="card-body">
@@ -37,8 +38,8 @@ const detailsUrl = computed(() => `/admin/assignments/${props.id}`);
           <span class="value">{{start_time}} - {{end_time}}</span>
         </div>
         <div class="info-row">
-          <span class="label">Status:</span>
-          <span class="value">{{status}}</span>
+          <span class="label">Postcode:</span>
+          <span class="value">{{postcode}}</span>
         </div>
         <div class="info-row">
           <span class="label">Application Count:</span>

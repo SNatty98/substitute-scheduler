@@ -56,6 +56,7 @@ onUnmounted(() => {
         :end_time="assignment.end_time"
         :status="assignment.status"
         :application_count="assignment.application_count"
+        :postcode="assignment.school_postcode"
       />
     </div>
   </div>

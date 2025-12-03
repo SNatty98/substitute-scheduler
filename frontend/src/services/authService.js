@@ -22,4 +22,9 @@ export const authService = {
     isAuthenticated() {
         return !!localStorage.getItem('token');
     },
+
+    async register_substitute(userData) {
+        const { data } = await api.post(`/auth/register/substitute/`, userData)
+        return data;
+    }
 };

@@ -1,0 +1,44 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Register">
+    <main class="container">
+        <div class="register-card">
+            <h1>Register</h1>
+            <div id="registerForm"></div>
+        </div>
+    </main>
+</BaseLayout>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        min-height: 100vh;
+        padding: var(--spacing-xl);
+    }
+
+    .register-card {
+        background: var(--color-bg-white);
+        padding: var(--spacing-xl);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        width: 100%;
+        max-width: 600px;
+    }
+
+    h1 {
+        margin-bottom: var(--spacing-lg);
+        text-align: center;
+        color: var(--color-text);
+        font-size: var(--font-2xl);
+        font-weight: var(--font-semibold);
+    }
+</style>
+
+<script>
+    import { createApp } from "vue";
+    import RegisterForm from "../components/RegisterForm.vue";
+    createApp(RegisterForm).mount("#registerForm");
+</script>

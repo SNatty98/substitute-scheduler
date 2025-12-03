@@ -123,7 +123,7 @@ function goBack() {
                     {{ application.substitute.user.first_name }} 
                     {{ application.substitute.user.last_name }}
                   </h3>
-                  <span class="distance">{{ application.distance.toFixed(1) }} miles away</span>
+                  <span class="distance">{{ Number(application.distance).toFixed(1)}} miles away</span>
                 </div>
                 <span :class="['app-status-badge', `badge-${application.status}`]">
                   {{ application.status }}

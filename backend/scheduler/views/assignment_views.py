@@ -23,7 +23,11 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        queryset = Assignment.objects.filter(created_by=self.request.user)
+        queryset = queryset.filter(created_by=self.request.user)
+
+        if self.action == 'retrieve':
+            queryset = queryset.prefetch_related(
+                'applications__substitute__user')
 
         # Filtering by status
         status_filter = self.request.query_params.get('status')

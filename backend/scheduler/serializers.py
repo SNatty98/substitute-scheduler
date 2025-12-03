@@ -49,10 +49,15 @@ class AssignmentDetailSerializer(serializers.ModelSerializer):
 
 class ApplicationSerializer(serializers.ModelSerializer):
     substitute = SubstituteSerializer(read_only=True)
-    assignment_details = AssignmentListSerializer(
-        source='assignment', read_only=True)
+    distance = serializers.DecimalField(
+        source='distance_miles',
+        max_digits=5,
+        decimal_places=2,
+        read_only=True
+    )
 
     class Meta:
         model = Application
-        fields = '__all__'
-        read_only_fields = ['substitute', 'applied_at', 'updated_at']
+        fields = ['id', 'assignment', 'substitute', 'status',
+                  'message', 'distance', 'applied_at', 'updated_at']
+        read_only_fields = ['applied_at', 'updated_at']

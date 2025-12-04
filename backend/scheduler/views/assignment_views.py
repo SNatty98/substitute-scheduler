@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -23,7 +24,8 @@ class AssignmentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        queryset = queryset.filter(created_by=self.request.user)
+        queryset = queryset.filter(
+            created_by=self.request.user, date__gte=timezone.now().date())
 
         if self.action == 'retrieve':
             queryset = queryset.prefetch_related(
@@ -84,3 +86,14 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             )
         except ValueError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'])
+    def available(self, request):
+
+        queryset = Assignment.objects.filter(
+            status='open',
+            date__gte=timezone.now().date()
+        ).select_related('created_by').order_by('date', 'start_time')
+
+        serializer = AssignmentListSerializer(queryset, many=True)
+        return Response(serializer.data)

@@ -7,7 +7,7 @@ from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 
 from ..models import Assignment, Application
-from ..serializers import AssignmentListSerializer, AssignmentDetailSerializer
+from ..serializers import AssignmentForSubstituteSerializer, AssignmentListSerializer, AssignmentDetailSerializer
 from ..services import AssignmentService
 
 
@@ -21,13 +21,26 @@ class AssignmentViewSet(viewsets.ModelViewSet):
             return AssignmentDetailSerializer
         return AssignmentListSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if request.user.role == 'substitute':
+            serializer = AssignmentForSubstituteSerializer(
+                instance,
+                context={'request': request}
+            )
+        else:
+            serializer = self.get_serializer(instance)
+
+        return Response(serializer.data)
+
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        queryset = queryset.filter(
-            created_by=self.request.user, date__gte=timezone.now().date())
+        if self.request.user.role == 'admin':
+            queryset = queryset.filter(
+                created_by=self.request.user, date__gte=timezone.now().date())
 
-        if self.action == 'retrieve':
+        if self.action == 'retrieve' and self.request.user.role == 'admin':
             queryset = queryset.prefetch_related(
                 'applications__substitute__user')
 

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import User, Substitute, Assignment, Application
+from .services.postcode_service import PostcodeService
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -45,6 +46,39 @@ class AssignmentDetailSerializer(serializers.ModelSerializer):
     def get_applications(self, obj):
         applications = obj.applications.select_related('substitute__user')
         return ApplicationSerializer(applications, many=True).data
+
+
+class AssignmentForSubstituteSerializer(serializers.ModelSerializer):
+    distance = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Assignment
+        fields = ['id', 'school_name', 'school_postcode', 'date',
+                  'start_time', 'end_time', 'subject', 'year_group',
+                  'notes', 'status', 'distance']
+
+    def get_distance(self, obj):
+        request = self.context.get('request')
+        subsitute = request.user.substitute_profile
+
+        if not all([subsitute.latitude,
+                    subsitute.longitude,
+                    obj.school_latitude,
+                    obj.school_longitude
+                    ]):
+            return None
+
+        try:
+            distance = PostcodeService.calculate_distance(
+                float(subsitute.latitude),
+                float(subsitute.longitude),
+                float(obj.school_latitude),
+                float(obj.school_longitude)
+            )
+            return round(distance, 1)
+        except Exception as e:
+            print(f"Error calculating distance {e}")
+            return None
 
 
 class ApplicationSerializer(serializers.ModelSerializer):

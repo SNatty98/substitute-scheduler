@@ -9,9 +9,10 @@ const props = defineProps({
     end_time:String,
     status:String,
     application_count:Number,
-    postcode:String
+    postcode:String,
+    linkprefix:String
 });
-const detailsUrl = computed(() => `/admin/assignments/${props.id}`);
+const detailsUrl = computed(() => `/${props.linkprefix}/assignments/${props.id}`);
 </script>
 
 <template>

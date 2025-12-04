@@ -1,6 +1,5 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import AssignmentCard from "../../components/AssignmentCard.vue";
 ---
 
 <BaseLayout title="Admin Dashboard">
@@ -152,11 +151,10 @@ import AssignmentCard from "../../components/AssignmentCard.vue";
     <script>
         import { createApp } from "vue";
         import { authService } from "../../services/authService";
-        import DashboardContent from "../../components/DashboardContent.vue";
+        import * as DashboardContent from "../../components/DashboardContent.vue";
         import ModalContainer from "../../components/ModalContainer.vue";
 
         let modalApp: any;
-        let assignmentsApp: any;
 
         async function checkAuth() {
             const loading = document.getElementById("loading");
@@ -191,8 +189,12 @@ import AssignmentCard from "../../components/AssignmentCard.vue";
         }
 
         function setupAssignments() {
-            const app = createApp(DashboardContent);
-            assignmentsApp = app.mount("#assignments-app");
+            const Dashboard = (DashboardContent as any).default;
+
+            const app = createApp(Dashboard, {
+                mode: "admin",
+            });
+            app.mount("#assignments-app");
         }
 
         function setupModal() {

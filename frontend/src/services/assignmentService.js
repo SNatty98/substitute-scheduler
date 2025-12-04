@@ -14,5 +14,10 @@ export const assignmentService = {
     async getById(id) {
         const { data } = await api.get(`/assignments/${id}/`);
         return data;
+    },
+
+    async getAvailable() {
+        const { data } = await api.get(`/assignments/available/`);
+        return data;
     }
 };

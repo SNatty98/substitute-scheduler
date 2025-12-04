@@ -7,9 +7,24 @@ const assignments = ref([]);
 const loading = ref(true);
 const error = ref('');
 
+const props = defineProps({
+  mode:{
+    type:String,
+    required:                                                                                                                                                  true,
+    validator: (value) => ['admin', 'substitute'].includes(value)
+  }
+});
+
 async function loadAssignments() {
   try {
-    assignments.value = await assignmentService.getAll();
+    if(props.mode === 'admin')
+    { 
+      assignments.value = await assignmentService.getAll();
+    } 
+    else 
+    {
+      assignments.value = await assignmentService.getAvailable();
+    }
     console.log('Assignments loaded:', assignments.value);
   } catch (err) {
     console.error('Failed to load assignments:', err);
@@ -27,7 +42,6 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('refresh-assignments', loadAssignments);
 });
-
 </script>
 
 <template>
@@ -57,6 +71,7 @@ onUnmounted(() => {
         :status="assignment.status"
         :application_count="assignment.application_count"
         :postcode="assignment.school_postcode"
+        :linkprefix="props.mode"
       />
     </div>
   </div>

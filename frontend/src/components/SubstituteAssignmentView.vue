@@ -42,8 +42,6 @@ async function handleApplication() {
 
     applying.value = true;  
     applicationError.value = '';
-    console.log(props.assignmentId);
-    console.log(applicationMessage.value);
     try {
         await applicationService.apply(props.assignmentId, applicationMessage.value)
         alert('Application submitted successfully!');

@@ -19,5 +19,11 @@ export const assignmentService = {
     async getAvailable() {
         const { data } = await api.get(`/assignments/available/`);
         return data;
+    },
+
+    async selectSubstitute(assignmentId, applicationId) {
+        const { data } = await api.post(`/assignments/${assignmentId}/select_substitute/`,
+            { application_id: applicationId })
+        return data;
     }
 };

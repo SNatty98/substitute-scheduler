@@ -18,23 +18,38 @@ onMounted(async () => {
 
 async function loadAssignment() {
     
-    loading.value = true;
-    error.value = '';
-    try
-    {
-        assignment.value = await assignmentService.getById(props.assignmentId)
-    }
-    catch (err)
-    {
-        error.value = 'Failed to load assignment.'
-    }
-    finally {
-        loading.value = false;
-    }
+  loading.value = true;
+  error.value = '';
+  try {
+    assignment.value = await assignmentService.getById(props.assignmentId)
+  }
+  catch (err) {
+    error.value = 'Failed to load assignment.'
+  }
+  finally {
+     loading.value = false;
+  }
+}
+
+async function handleSelectSubstitute(applicationId) {
+    
+  loading.value = true;
+  error.value = '';
+  try {
+    await assignmentService.selectSubstitute(props.assignmentId, applicationId);
+    alert('Substitute selected successfully!');
+    goBack();
+  }
+  catch(err) {
+    error.value = "Failed to select substitute."
+  } 
+  finally {
+    loading.value = false;
+  }
 }
 
 function goBack() {
-    window.location.href = '/admin/dashboard';
+  window.location.href = '/admin/dashboard';
 }
 
 </script>
